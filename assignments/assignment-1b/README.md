@@ -17,6 +17,9 @@ Stochastic Gradient Descent(additional details in markdown cell):<br>
 * Data must be preprocessed
 * Uses different hyperparameters
 * The precision vs recall curve shows how as recall increases, precision decreases
+* It plots precision and recall at different thresholds
+* Random guessing tends to produce a straight line instead of a curve
+* A good curve points towards the top right of the plot
 * A perfect curve is shown in testing.ipynb to prove that the logistic regression model works<br>
 <br>Logistic Regression observations:<br>
 * My precision peaked at around 0.4 which is better than rando guessing(~0.175) showing that the model does indeed work, but not very well(the data may have little correlation or need better preprocessing)
