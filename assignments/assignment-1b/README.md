@@ -1,6 +1,6 @@
 Assignment-1b<br>
 10/06/2024<br>
-All equations are shown in 02-assigment-1.ipynb as markdown cells under the output<br>
+All equations are shown in assigment-1b.ipynb as markdown cells under the output<br>
 The first code cell for Logistic Regression has a "Do not run" comment at the start since the cell preprocesses the data and creates a csv file which does not need to be recreated<br>
 Stochastic Gradient Descent(additional details in markdown cell):<br>
 * Uses 5 hyperparameters: learning_rate, lambda, mini_batch size, momentum, and learning rate decay
