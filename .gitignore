@@ -27,8 +27,6 @@ share/python-wheels/
 MANIFEST
 assignments/assignment-1b/train/train.csv
 assignments/assignment-2b/datasets
-assignments/assignment-2b/pre_trained
-assignments/assignment-2b/results
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
