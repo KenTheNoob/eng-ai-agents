@@ -65,6 +65,12 @@ dependencies = [
     "optuna<3.0.0",
     "ray>=2.35.0",
     "captum>=0.7.0",
+    "bs4>=0.0.2",
+    "pymongo>=4.10.1",
+    "langchain>=0.3.10",
+    "qdrant-client>=1.12.1",
+    "langchain-community>=0.3.10",
+    "langchain-openai>=0.2.11",
 ]
 readme = "README.md"
 requires-python = "== 3.11.9"
