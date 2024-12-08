@@ -14,9 +14,9 @@ from qdrant_client.http.models import Distance, PointStruct, VectorParams
 
 # Setup ClearML
 try:
-    load_dotenv()
+    load_dotenv(override=True)
 except Exception:
-    load_dotenv(sys.path[1] + "/.env")
+    load_dotenv(sys.path[1] + "/.env", override=True)
 CLEARML_WEB_HOST = os.getenv("CLEARML_WEB_HOST")
 CLEARML_API_HOST = os.getenv("CLEARML_API_HOST")
 CLEARML_FILES_HOST = os.getenv("CLEARML_FILES_HOST")
@@ -31,9 +31,9 @@ def retreiveDocuments():
     texts = []
     # Create a mongoDB connection
     try:
-        load_dotenv()
+        load_dotenv(override=True)
     except Exception:
-        load_dotenv(sys.path[1] + "/.env")
+        load_dotenv(sys.path[1] + "/.env", override=True)
     DATABASE_HOST = os.getenv("DATABASE_HOST")
     mongoHost = pymongo.MongoClient(DATABASE_HOST)
     mongoDatabase = mongoHost["twin"]
@@ -82,7 +82,15 @@ def embedChunks(chunks):
     embeddings = []
     # Setup the text embedder
     MODEL = "llama3.2"
-    embeddingsModel = OllamaEmbeddings(model=MODEL)
+    try:
+        load_dotenv(override=True)
+    except Exception:
+        load_dotenv(sys.path[1] + "/.env", override=True)
+    USE_DOCKER = os.getenv("USE_DOCKER")
+    if USE_DOCKER == "True":
+        embeddingsModel = OllamaEmbeddings(model=MODEL, base_url="http://host.docker.internal:11434")
+    else:
+        embeddingsModel = OllamaEmbeddings(model=MODEL)
     for chunk in chunks:
         embeddings.append(embeddingsModel.embed_query(chunk))
     return embeddings
@@ -92,9 +100,9 @@ def embedChunks(chunks):
 def storeEmbeddings(embeddings, links, resultTypes, chunks, chunkNums):
     # Create a qdrant connection
     try:
-        load_dotenv()
+        load_dotenv(override=True)
     except Exception:
-        load_dotenv(sys.path[1] + "/.env")
+        load_dotenv(sys.path[1] + "/.env", override=True)
     USE_QDRANT_CLOUD = os.getenv("USE_QDRANT_CLOUD")
     QDRANT_CLOUD_URL = os.getenv("QDRANT_CLOUD_URL")
     QDRANT_APIKEY = os.getenv("QDRANT_APIKEY")
@@ -145,7 +153,7 @@ def storeEmbeddings(embeddings, links, resultTypes, chunks, chunkNums):
 @PipelineDecorator.pipeline(
     name="Feature Pipeline",
     project="RAG LLM",
-    version="0.2",
+    version="0.3",
 )
 def main():
     links, resultTypes, texts = retreiveDocuments()

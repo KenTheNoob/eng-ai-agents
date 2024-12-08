@@ -13,9 +13,9 @@ from qdrant_client import QdrantClient
 
 # Setup ClearML
 try:
-    load_dotenv()
+    load_dotenv(override=True)
 except Exception:
-    load_dotenv(sys.path[1] + "/.env")
+    load_dotenv(sys.path[1] + "/.env", override=True)
 CLEARML_WEB_HOST = os.getenv("CLEARML_WEB_HOST")
 CLEARML_API_HOST = os.getenv("CLEARML_API_HOST")
 CLEARML_FILES_HOST = os.getenv("CLEARML_FILES_HOST")
@@ -28,7 +28,15 @@ CLEARML_API_SECRET_KEY = os.getenv("CLEARML_API_SECRETKEY")
 def queryExpansion(query):
     # Setup the model
     MODEL = "llama3.2"
-    model = Ollama(model=MODEL)
+    try:
+        load_dotenv(override=True)
+    except Exception:
+        load_dotenv(sys.path[1] + "/.env", override=True)
+    USE_DOCKER = os.getenv("USE_DOCKER")
+    if USE_DOCKER == "True":
+        model = Ollama(model=MODEL, base_url="http://host.docker.internal:11434")
+    else:
+        model = Ollama(model=MODEL)
 
     template = """
     Rewrite the prompt. The new prompt must offer a different perspective.
@@ -45,7 +53,15 @@ def queryExpansion(query):
 def selfQuerying(query):
     # Setup the model
     MODEL = "llama3.2"
-    model = Ollama(model=MODEL)
+    try:
+        load_dotenv(override=True)
+    except Exception:
+        load_dotenv(sys.path[1] + "/.env", override=True)
+    USE_DOCKER = os.getenv("USE_DOCKER")
+    if USE_DOCKER == "True":
+        model = Ollama(model=MODEL, base_url="http://host.docker.internal:11434")
+    else:
+        model = Ollama(model=MODEL)
 
     template = """
     You are an AI assistant. You must determine if the prompt requires code as the answer.
@@ -62,20 +78,28 @@ def selfQuerying(query):
 def filteredVectorSearch(query, newQuery, codingQuestion):
     # Create a qdrant connection
     try:
-        load_dotenv()
+        load_dotenv(override=True)
     except Exception:
-        load_dotenv(sys.path[1] + "/.env")
+        load_dotenv(sys.path[1] + "/.env", override=True)
     USE_QDRANT_CLOUD = os.getenv("USE_QDRANT_CLOUD")
     QDRANT_CLOUD_URL = os.getenv("QDRANT_CLOUD_URL")
     QDRANT_APIKEY = os.getenv("QDRANT_APIKEY")
-    if USE_QDRANT_CLOUD:
+    if USE_QDRANT_CLOUD=="True":
         qClient = QdrantClient(url=QDRANT_CLOUD_URL, api_key=QDRANT_APIKEY)
     else:
         qClient = QdrantClient(url=QDRANT_CLOUD_URL)
 
     # Setup the text embedder
     MODEL = "llama3.2"
-    embeddingsModel = OllamaEmbeddings(model=MODEL)
+    try:
+        load_dotenv(override=True)
+    except Exception:
+        load_dotenv(sys.path[1] + "/.env", override=True)
+    USE_DOCKER = os.getenv("USE_DOCKER")
+    if USE_DOCKER == "True":
+        embeddingsModel = OllamaEmbeddings(model=MODEL, base_url="http://host.docker.internal:11434")
+    else:
+        embeddingsModel = OllamaEmbeddings(model=MODEL)
 
     # Search the related collection
     relatedCollection = "Document"
@@ -119,7 +143,7 @@ def reranking(results):
     texts = [result.payload["text"] for result in results]
     topTexts = ""
     for index in topIndexes:
-        topTexts += texts[index][0]
+        topTexts += texts[index]
     return topTexts
 
 
@@ -149,7 +173,15 @@ def buildingPrompt(codingQuestion):
 def obtainingAnswer(query, prompt, topTexts):
     # Setup the model
     MODEL = "llama3.2"
-    model = Ollama(model=MODEL)
+    try:
+        load_dotenv(override=True)
+    except Exception:
+        load_dotenv(sys.path[1] + "/.env", override=True)
+    USE_DOCKER = os.getenv("USE_DOCKER")
+    if USE_DOCKER == "True":
+        model = Ollama(model=MODEL, base_url="http://host.docker.internal:11434")
+    else:
+        model = Ollama(model=MODEL)
 
     chain = (
         {"document": itemgetter("document"), "question": itemgetter("question")}
