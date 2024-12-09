@@ -104,7 +104,7 @@ def storeEmbeddings(embeddings, links, resultTypes, chunks, chunkNums):
     USE_QDRANT_CLOUD = os.getenv("USE_QDRANT_CLOUD")
     QDRANT_CLOUD_URL = os.getenv("QDRANT_CLOUD_URL")
     QDRANT_APIKEY = os.getenv("QDRANT_APIKEY")
-    if USE_QDRANT_CLOUD:
+    if USE_QDRANT_CLOUD == "True":
         qClient = QdrantClient(url=QDRANT_CLOUD_URL, api_key=QDRANT_APIKEY)
     else:
         qClient = QdrantClient(url=QDRANT_CLOUD_URL)
