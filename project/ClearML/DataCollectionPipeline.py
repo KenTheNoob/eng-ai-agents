@@ -7,12 +7,12 @@ import subprocess
 import sys
 import tempfile
 import time
+import urllib.parse
 
 import pymongo
 import requests
 from bs4 import BeautifulSoup
 from clearml import PipelineDecorator
-import urllib.parse
 from dotenv import load_dotenv
 
 # Setup ClearML
@@ -39,7 +39,7 @@ links = [
     "https://github.com/gazebosim/gazebo-classic",
 ]
 """
-links = [ "https://www.ros.org/", "https://github.com/ros2/ros2" ]
+links = ["https://www.ros.org/", "https://github.com/ros2/ros2"]
 
 
 # ETL pipeline
@@ -138,25 +138,31 @@ def ETL_Pipeline(links):
                     text = text.replace("\n", " ")
                     text_len = len(text)
                     for i in range(text_len):
-                        while i + 1 < text_len and text[i] == " " and text[i + 1] == " ":
+                        while (
+                            i + 1 < text_len and text[i] == " " and text[i + 1] == " "
+                        ):
                             text = text[:i] + text[i + 1 :]
                             text_len -= 1
                     if "404" not in text:
-                        documents.append({"link": link, "type": "Document", "content": text})
+                        documents.append(
+                            {"link": link, "type": "Document", "content": text}
+                        )
                     # Also crawl through all subdirectorys in the link(related links)
                     soup = BeautifulSoup(r.content, "html.parser")
                     subdirectories = [a.get("href") for a in soup.find_all("a")]
                     for subdirectory in subdirectories:
                         newLink = urllib.parse.urljoin(link, subdirectory)
                         if (
-                            subdirectory is not None and
-                            'http' not in subdirectory and
-                            '#' not in subdirectory and
-                            mongoCollection.find_one({"link": newLink}) is None and
-                            newLink not in links
+                            subdirectory is not None
+                            and "http" not in subdirectory
+                            and "#" not in subdirectory
+                            and ".zip" not in subdirectory
+                            and ".pdf" not in subdirectory
+                            and mongoCollection.find_one({"link": newLink}) is None
+                            and newLink not in links
                         ):
                             links.append(newLink)
-                except:
+                except Exception:
                     print("Could not crawl link", link)
         # Avoid spamming sites
         time.sleep(0.1)
