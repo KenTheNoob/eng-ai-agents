@@ -79,7 +79,6 @@ def chunkDocuments(texts):
 
 @PipelineDecorator.component(cache=False, return_values=["embeddings"])
 def embedChunks(chunks):
-    embeddings = []
     # Setup the text embedder
     MODEL = "llama3.2"
     try:
@@ -91,11 +90,10 @@ def embedChunks(chunks):
         embeddingsModel = OllamaEmbeddings(model=MODEL, base_url="http://host.docker.internal:11434")
     else:
         embeddingsModel = OllamaEmbeddings(model=MODEL)
-    for chunk in chunks:
-        embeddings.append(embeddingsModel.embed_query(chunk))
-    return embeddings
+    return embeddingsModel.embed_documents(chunks)
 
 
+# Create embeddings for each chunk, of length 3072 using the embedding model
 @PipelineDecorator.component(cache=False)
 def storeEmbeddings(embeddings, links, resultTypes, chunks, chunkNums):
     # Create a qdrant connection
@@ -128,8 +126,6 @@ def storeEmbeddings(embeddings, links, resultTypes, chunks, chunkNums):
         chunkIndex += 1
         if chunkNum == 0:
             documentIndex += 1
-        # Store all documents from each MongoDB collection into qdrant
-        # Create embeddings for each chunk, of length 2048 using the embedding model
         # Store the embedding along with some metadata into the Qdrant vector database
         qClient.upsert(
             collection_name=resultTypes[documentIndex],

@@ -151,7 +151,9 @@ def ETL_Pipeline(links):
                         if (
                             subdirectory is not None and
                             'http' not in subdirectory and
-                            mongoCollection.find_one({"link": newLink}) is None
+                            '#' not in subdirectory and
+                            mongoCollection.find_one({"link": newLink}) is None and
+                            newLink not in links
                         ):
                             links.append(newLink)
                 except:

@@ -1,15 +1,8 @@
-# Make sure you have run "ollama serve"
+# Make sure ollama serve is running(docker or terminal)
 # This is the same code as ClearML
-import os
-import sys
 from operator import itemgetter
-
 import gradio as gr
-from dotenv import load_dotenv
 from langchain.prompts import PromptTemplate
-from langchain_community.embeddings import OllamaEmbeddings
-from langchain_community.llms import Ollama
-from qdrant_client import QdrantClient
 from shared import getModel, getEmbeddingsModel, getQdrantClient
 
 def answer(samplePrompt, useSample, Query):
@@ -84,8 +77,6 @@ def answer(samplePrompt, useSample, Query):
     links = [result.payload['link'] for result in results]
     topTexts = ''
     for index in topIndexes:
-        print("Top texts: ", texts[index])
-        print("Link: ", links[index])
         topTexts += texts[index]
 
     # Building prompt
@@ -99,7 +90,10 @@ def answer(samplePrompt, useSample, Query):
         prompt = PromptTemplate.from_template(template)
     else:
         template = """
-        Answer the question based on the document below. If you can't answer the question, reply "I don't know"
+        You are an AI agent that has retreived a document from the web.
+        If the document is useful for answering the question use it.
+        If the document is not useful, answer normally.
+        Do not mention the document.
 
         Document: {document}
         Question: {question}
@@ -115,7 +109,10 @@ demo = gr.Interface(
     fn=answer,
     inputs=[
         gr.Dropdown(
-            ["What is ROS?", "Write me code to move a robot"], label="Sample Prompt"
+            ["How can I develop the navigation stack of an agent with egomotion?",
+             "What is ROS?", "How many companies is Nav2 trusted by worldwide?",
+             "How would I build a ROS 2 Navigation Framework and System?",
+             "Write me code to move a robot using Moveit"], label="Sample Prompt"
         ),
         "checkbox",
         "text",
